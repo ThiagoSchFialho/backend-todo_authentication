@@ -4,7 +4,7 @@ class UserModel {
     async createUser(email, password) {
         try {
             const result = await pool.query(`
-                INSERT INTO "user" (email, password)
+                INSERT INTO users (email, password)
                 VALUES ($1, $2)
                 RETURNING *;
             `, [email, password]);
@@ -19,7 +19,7 @@ class UserModel {
     async getUserById(id) {
         try {
             const result = await pool.query(`
-                SELECT * FROM "user"
+                SELECT * FROM users
                 WHERE id = $1;
             `, [id]);
 
@@ -33,7 +33,7 @@ class UserModel {
     async getUserByEmail(email) {
         try {
             const result = await pool.query(`
-                SELECT * FROM "user"
+                SELECT * FROM users
                 WHERE email = $1;    
             `, [email]);
 
@@ -47,7 +47,7 @@ class UserModel {
     async updateEmail(id, email) {
         try {
             const result = await pool.query(`
-                UPDATE "user"
+                UPDATE users
                 SET email = $1
                 WHERE id = $2
                 RETURNING *;
@@ -63,7 +63,7 @@ class UserModel {
     async updatePassword(id, password) {
         try {
             const result = await pool.query(`
-                UPDATE "user"
+                UPDATE users
                 SET password = $1
                 WHERE id = $2
                 RETURNING *;    
@@ -79,7 +79,7 @@ class UserModel {
     async deleteUser(id) {
         try {
             const result = await pool.query(`
-                DELETE FROM "user"
+                DELETE FROM users
                 WHERE id = $1
                 RETURNING *;  
             `, [id]);

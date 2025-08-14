@@ -4,6 +4,8 @@ const { TaskModel } = require('../models/task.model.js');
 
 const taskModel = new TaskModel();
 
+
+// Cria uma nova tarefa
 router.post('/', async function(req, res, next) {
   const { title, date, time, description, category } = req.body;
   const { user_id } = req.query;
@@ -21,6 +23,7 @@ router.post('/', async function(req, res, next) {
   }
 });
 
+// Recupera todas as tarefas do usuário
 router.get('/', async function(req, res, next) {
   const { user_id } = req.query;
 
@@ -36,8 +39,10 @@ router.get('/', async function(req, res, next) {
   }
 });
 
-router.put('/', async function(req, res, next) {
-  const { id, title, date, time, description, category } = req.body;
+// Atualiza uma tarefa
+router.put('/:id', async function(req, res, next) {
+  const { id } = req.params;
+  const { title, date, time, description, category } = req.body;
   const { user_id } = req.query;
 
   try {
@@ -54,8 +59,9 @@ router.put('/', async function(req, res, next) {
   }
 });
 
-router.delete('/', async function(req, res, next) {
-  const { id } = req.body;
+// Exclui uma tarefa
+router.delete('/:id', async function(req, res, next) {
+  const { id } = req.params;
   const { user_id } = req.query;
 
   try{
