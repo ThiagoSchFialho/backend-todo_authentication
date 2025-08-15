@@ -6,27 +6,6 @@ const { UserModel } = require('../models/user.model');
 
 const userModel = new UserModel();
 
-// Cria um novo usuário
-router.post('/', async function(req, res, next) {
-  const { email, password } = req.body;
-
-  try {
-    if (!email || !password) return res.status(400).json({ error: 'Dados obrigatórios não informados' });
-
-    const userCheck = await userModel.getUserByEmail(email);
-    if (userCheck) return res.status(409).json({ error: 'email indisponivel' });
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = await userModel.createUser(email, hashedPassword);
-
-    return res.status(201).json(user);
-
-  } catch (error) {
-    console.error('Falha ao criar usuário', error);
-    return res.status(500).json({ error: 'Erro interno do servidor' });
-  }
-});
-
 // Recupera um usuário pelo id
 router.get('/:id', async function(req, res, next) {
   const { id } = req.params;
@@ -38,7 +17,7 @@ router.get('/:id', async function(req, res, next) {
     
     if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
 
-    return res.status(200).json(user);
+    return res.status(200).json({ id: user.id, email: user.email });
 
   } catch (error) {
     console.error('falha ao recuperar usuário', error);
@@ -79,7 +58,7 @@ router.put('/email/:id', async function(req, res, next) {
 
     const updatedUser = await userModel.updateEmail(id, email);
 
-    return res.status(200).json(updatedUser);
+    return res.status(200).json({ id: updatedUser.id, email: updatedUser.email });
 
   } catch (error) {
     console.error('falha ao atualizar usuário', error);
@@ -102,7 +81,7 @@ router.put('/password/:id', async function(req, res, next) {
     const hashedPassword = await bcrypt.hash(password, 10);
     const updatedUser = await userModel.updatePassword(id, hashedPassword);
 
-    return res.status(200).json(updatedUser);
+    return res.status(200).json({ id: updatedUser.id, email: updatedUser.email });
 
   } catch (error) {
     console.error('falha ao atualizar usuário', error);
@@ -122,7 +101,7 @@ router.delete('/:id', async function(req, res, next) {
 
     const user = await userModel.deleteUser(id);
     
-    return res.status(204).json(user);
+    return res.status(204);
 
   } catch (error) {
     console.error('falha ao excluir usuário', error);
@@ -134,6 +113,10 @@ router.delete('/:id', async function(req, res, next) {
 router.post('/login', async function(req, res, next) {
   try {
     const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
 
     const user = await userModel.getUserByEmail(email);
     if (!user) {
@@ -149,11 +132,36 @@ router.post('/login', async function(req, res, next) {
       expiresIn: '5h'
     });
 
-    res.status(200).json({ token });
+    return res.status(200).json({ token });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: 'Login failed' });
+    return res.status(500).json({ error: 'Login failed' });
   }
+});
+
+// Sign UP
+router.post('/signup', async function(req, res, next) {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({ error: 'Email and password are required' });
+    }
+
+    const user = await userModel.getUserByEmail(email);
+    if (user) {
+      return res.status(409).json({ error: 'Email already registered' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const newUser = await userModel.createUser(email, hashedPassword);
+
+    return res.status(201).json({ id: newUser.id, email: newUser.email });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ error: 'SignUp failed' });
+  }
+
 });
 
 module.exports = router;
