@@ -6,7 +6,17 @@ var logger = require('morgan');
 var tasksRouter = require('./routes/tasks');
 var usersRouter = require('./routes/users');
 
+const cors = require('cors');
+require('dotenv').config();
+
 var app = express();
+
+app.use(cors({
+    origin: process.env.FRONTEND_HOST,
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 
 app.use(logger('dev'));
 app.use(express.json());

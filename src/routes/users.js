@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { UserModel } = require('../models/user.model');
 
 const userModel = new UserModel();
@@ -127,6 +128,32 @@ router.delete('/:id', async function(req, res, next) {
     console.error('falha ao excluir usuário', error);
     return res.status(500).json({ error: 'Erro interno do servidor' });
   }
-})
+});
+
+// Login
+router.post('/login', async function(req, res, next) {
+  try {
+    const { email, password } = req.body;
+
+    const user = await userModel.getUserByEmail(email);
+    if (!user) {
+      return res.status(401).json({ error: 'Authentication failed' });
+    }
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: 'Authentication failed' });
+    }
+
+    const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
+      expiresIn: '5h'
+    });
+
+    res.status(200).json({ token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Login failed' });
+  }
+});
 
 module.exports = router;
