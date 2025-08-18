@@ -115,17 +115,17 @@ router.post('/login', async function(req, res, next) {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      return res.status(400).json({ error: 'E-mail e senha são obrigatórios' });
     }
 
     const user = await userModel.getUserByEmail(email);
     if (!user) {
-      return res.status(401).json({ error: 'Authentication failed' });
+      return res.status(401).json({ error: 'Credenciais Incorretas' });
     }
 
     const passwordMatch = await bcrypt.compare(password, user.password);
     if (!passwordMatch) {
-      return res.status(401).json({ error: 'Authentication failed' });
+      return res.status(401).json({ error: 'Credenciais Incorretas' });
     }
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, {
@@ -135,7 +135,7 @@ router.post('/login', async function(req, res, next) {
     return res.status(200).json({ token });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'Login failed' });
+    return res.status(500).json({ error: 'Falha no login' });
   }
 });
 
@@ -145,12 +145,12 @@ router.post('/signup', async function(req, res, next) {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.status(400).json({ error: 'Email and password are required' });
+      return res.status(400).json({ error: 'E-mail e senha são obrigatórios' });
     }
 
     const user = await userModel.getUserByEmail(email);
     if (user) {
-      return res.status(409).json({ error: 'Email already registered' });
+      return res.status(409).json({ error: 'Email já cadastrado' });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -159,7 +159,7 @@ router.post('/signup', async function(req, res, next) {
     return res.status(201).json({ id: newUser.id, email: newUser.email });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ error: 'SignUp failed' });
+    return res.status(500).json({ error: 'Falha no cadastro' });
   }
 
 });
