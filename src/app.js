@@ -5,7 +5,7 @@ var logger = require('morgan');
 
 var tasksRouter = require('./routes/tasks');
 var usersRouter = require('./routes/users');
-var categoryRouter = require('./routes/category');
+var categoriesRouter = require('./routes/categories');
 
 const cors = require('cors');
 require('dotenv').config();
@@ -27,6 +27,6 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/users', usersRouter);
 app.use('/tasks', tasksRouter);
-app.use('/category', categoryRouter);
+app.use('/categories', categoriesRouter);
 
 module.exports = app;
