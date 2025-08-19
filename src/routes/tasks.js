@@ -7,14 +7,14 @@ const taskModel = new TaskModel();
 
 // Cria uma nova tarefa
 router.post('/', async function(req, res, next) {
-  const { title, date, time, description, category } = req.body;
+  const { title, date, time, description, category_id } = req.body;
   const { user_id } = req.query;
 
   try {
     if (!user_id) return res.status(400).json({ error: 'Usuário indefinido' });
     if (!title || !date ) return res.status(400).json({ error: 'Campos obrigatórios ausentes' });
     
-    const task = await taskModel.createTask(title, date, time, description, category, user_id);
+    const task = await taskModel.createTask(title, date, time, description, category_id, user_id);
     res.status(201).json(task);
 
   } catch (error) {
@@ -42,15 +42,15 @@ router.get('/', async function(req, res, next) {
 // Atualiza uma tarefa
 router.put('/:id', async function(req, res, next) {
   const { id } = req.params;
-  const { title, date, time, description, category, done} = req.body;
+  const { title, date, time, description, category_id, done} = req.body;
   const { user_id } = req.query;
 
-  console.log(id, title, date, time, description, category, done, user_id);
+  console.log(id, title, date, time, description, category_id, done, user_id);
 
   try {
     if (!user_id) return res.status(400).json({ error: 'Usuário indefinido' });
 
-    const task = await taskModel.updateTask(id, title, date, time, description, category, done, user_id);
+    const task = await taskModel.updateTask(id, title, date, time, description, category_id, done, user_id);
     if (!task) return res.status(404).json({ error: 'Tarefa não encontrada' });
 
     res.status(200).json(task);
