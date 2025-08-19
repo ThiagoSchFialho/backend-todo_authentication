@@ -45,10 +45,9 @@ router.put('/:id', async function(req, res, next) {
   const { title, date, time, description, category_id, done} = req.body;
   const { user_id } = req.query;
 
-  console.log(id, title, date, time, description, category_id, done, user_id);
-
   try {
     if (!user_id) return res.status(400).json({ error: 'Usuário indefinido' });
+    if (!title || !date ) return res.status(400).json({ error: 'Campos obrigatórios ausentes' });
 
     const task = await taskModel.updateTask(id, title, date, time, description, category_id, done, user_id);
     if (!task) return res.status(404).json({ error: 'Tarefa não encontrada' });
