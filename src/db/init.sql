@@ -6,7 +6,8 @@ create table users (
 
 create table category (
 	id serial primary key,
-	title varchar(255) not null
+	title varchar(255) not null,
+	user_id int references users(id) on delete cascade
 );
 
 create table task (
