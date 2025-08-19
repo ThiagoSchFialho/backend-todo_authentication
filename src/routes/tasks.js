@@ -42,13 +42,34 @@ router.get('/', async function(req, res, next) {
 // Atualiza uma tarefa
 router.put('/:id', async function(req, res, next) {
   const { id } = req.params;
-  const { title, date, time, description, category } = req.body;
+  const { title, date, time, description, category, done} = req.body;
+  const { user_id } = req.query;
+
+  console.log(id, title, date, time, description, category, done, user_id);
+
+  try {
+    if (!user_id) return res.status(400).json({ error: 'Usuário indefinido' });
+
+    const task = await taskModel.updateTask(id, title, date, time, description, category, done, user_id);
+    if (!task) return res.status(404).json({ error: 'Tarefa não encontrada' });
+
+    res.status(200).json(task);
+
+  } catch (error) {
+    console.error('Falha ao atualizar tarefa', error);
+    return res.status(500).json({ error: 'Erro interno do servidor' });
+  }
+});
+
+// Atualiza o status de feita de uma tarefa
+router.put('/done/:id', async function(req, res, next) {
+  const { id } = req.params;
   const { user_id } = req.query;
 
   try {
     if (!user_id) return res.status(400).json({ error: 'Usuário indefinido' });
 
-    const task = await taskModel.updateTask(id, title, date, time, description, category, user_id);
+    const task = await taskModel.updateStatusTask(id, user_id);
     if (!task) return res.status(404).json({ error: 'Tarefa não encontrada' });
 
     res.status(200).json(task);

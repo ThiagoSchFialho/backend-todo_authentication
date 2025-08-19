@@ -31,7 +31,7 @@ class TaskModel {
         }        
     }
 
-    async updateTask(id, title, date, time, description, category, user_id) {
+    async updateTask(id, title, date, time, description, category, done, user_id) {
         try {
             const result = await pool.query(`
                 UPDATE task
@@ -39,10 +39,27 @@ class TaskModel {
                     date = $2,
                     time = $3,
                     description = $4,
-                    category = $5
-                WHERE id = $6 AND user_id = $7
+                    category = $5,
+                    done = $6
+                WHERE id = $7 AND user_id = $8
                 RETURNING *;
-            `, [title, date, time, description, category, id, user_id]);
+            `, [title, date, time, description, category, done, id, user_id]);
+
+            return result.rows[0];
+        } catch (error) {
+            console.error('Erro ao atualizar tarefa', error);
+            throw error;
+        }
+    }
+
+    async updateStatusTask(id, user_id) {
+        try {
+            const result = await pool.query(`
+                UPDATE task
+                SET done = NOT done
+                WHERE id = $1 AND user_id = $2
+                RETURNING *;
+            `, [id, user_id]);
 
             return result.rows[0];
         } catch (error) {
