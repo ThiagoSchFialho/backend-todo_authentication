@@ -19,9 +19,23 @@ class TaskModel {
     async getTasks(user_id) {
         try {
             const result = await pool.query(`
-                SELECT * FROM task
-                WHERE user_id = $1
-                ORDER BY date, time;
+                SELECT
+                    task.id,
+                    task.title,
+                    task.date,
+                    task.time,
+                    task.description,
+                    task.category_id,
+                    category.title AS category_name,
+                    task.user_id,
+                    task.done
+                FROM
+                    task
+                JOIN
+                    category ON task.category_id = category.id
+                WHERE
+                    task.user_id = $1
+                ORDER BY task.date, task.time;
             `, [user_id]);
 
             return result.rows;
